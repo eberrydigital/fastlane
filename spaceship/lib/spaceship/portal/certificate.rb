@@ -230,11 +230,27 @@ module Spaceship
           return [csr, key]
         end
 
-        def create_apple_pay_certificate_signing_request
+        def create_apple_pay_certificate_processing_signing_request
           OpenSSL::PKey::EC.send(:alias_method, :private?, :private_key?)
 
           ec_domain_key = OpenSSL::PKey::EC.new('prime256v1')
           ec_public = OpenSSL::PKey::EC.new('prime256v1')
+          ec_domain_key.generate_key
+          ec_public.public_key = ec_domain_key.public_key
+
+          csr = OpenSSL::X509::Request.new
+          csr.subject = OpenSSL::X509::Name.new([
+                                                  ['CN', 'spaceship', OpenSSL::ASN1::UTF8STRING]
+                                                ])
+          csr.public_key = ec_public
+          csr.sign(ec_domain_key, OpenSSL::Digest::SHA256.new)
+          return [csr, ec_domain_key]
+        end
+
+        def create_apple_pay_certificate_identity_signing_request
+          OpenSSL::PKey::EC.send(:alias_method, :private?, :private_key?)
+          ec_domain_key = OpenSSL::PKey::RSA.new(2048)
+          ec_public = OpenSSL::PKey::RSA.new(2048)
           ec_domain_key.generate_key
           ec_public.public_key = ec_domain_key.public_key
 
@@ -350,7 +366,9 @@ module Spaceship
           csr = OpenSSL::X509::Request.new(csr) if csr.kind_of?(String)
 
           # if this succeeds, we need to save the .cer and the private key in keychain access or wherever they go in linux
-          if type == '4APLUP237T' # = ApplePay
+          if type == '4APLUP237T' # = ApplePay Merchant Identity
+            response = client.create_certificate_apple_pay!(type, csr.to_pem, merchant_id, mac)
+          elsif type == 'MD8Q2VRT6A' # = ApplePay Payment Processing
             response = client.create_certificate_apple_pay!(type, csr.to_pem, merchant_id, mac)
           else
             response = client.create_certificate!(type, csr.to_pem, app_id, mac)

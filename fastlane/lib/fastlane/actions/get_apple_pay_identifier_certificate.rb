@@ -6,7 +6,7 @@ module Fastlane
     end
 
     # This whole action is an adaption of pem/lib/pem/manager.rb
-    class GetApplePayCertificateAction < Action
+    class GetApplePayIdentifierCertificateAction < Action
       def self.run(params)
         login(params)
         create_certificate(params)
@@ -132,12 +132,12 @@ module Fastlane
 
       def self.example_code
         [
-          'get_apple_pay_certificate(
+          'get_apple_pay_identifier_certificate(
             username: "test@example.com",
             merchant_bundle_id: "merchant.com.rtayal.app",
             p12_password: "test"
           )',
-          'get_apple_pay_certificate(
+          'get_apple_pay_identifier_certificate(
             username: "test@example.com",
             merchant_bundle_id: "merchant.com.rtayal.app",
             p12_password: "test",
