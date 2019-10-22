@@ -22,7 +22,7 @@ module Fastlane
       def self.create_certificate(params)
         UI.important("Creating a new Apple Pay certificate.")
 
-        csr, pkey = Spaceship.certificate.create_apple_pay_certificate_identity_signing_request
+        csr, pkey = Spaceship.certificate.create_certificate_signing_request
 
         begin
           cert = certificate.create!(csr: csr, bundle_id: params[:merchant_bundle_id])
