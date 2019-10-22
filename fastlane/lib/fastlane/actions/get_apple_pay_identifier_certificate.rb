@@ -63,7 +63,7 @@ module Fastlane
       end
 
       def self.certificate
-        Spaceship.certificate.apple_pay_merchant_identifier
+        Spaceship.certificate.apple_pay_merchant_identity
       end
 
       #####################################################
